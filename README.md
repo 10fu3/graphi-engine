@@ -66,3 +66,57 @@ type comment_order_by {
     content: order_by
 }
 ```
+
+これを生成するためのgqlparserのASTは
+
+```go
+package test
+
+import "testing"
+import (
+	"github.com/vektah/gqlparser/v2"
+	"github.com/vektah/gqlparser/v2/formatter"
+	"github.com/vektah/gqlparser/v2/ast"
+)
+
+func TestGraphQLAstParser(t *testing.T) {
+    baseType := ""
+    
+    source := &ast.Source{
+        Input: baseType,
+    }
+    schema, err := gqlparser.LoadSchema(source)
+
+    if err != nil {
+        panic(err)
+    }
+    
+    schema.AddTypes(&ast.Definition{
+        Kind: "OBJECT",
+        Name: "comment",
+        Fields: []*ast.FieldDefinition{
+            {
+                Name: "id",
+                Type: &ast.Type{
+                    NamedType: "String",
+                },
+            },
+        	// フィールドがならぶ
+        },
+    }, &ast.Definition{
+    	Kind: "INPUT_OBJECT",
+    	Name: "comment_bool_exp",
+    	Fields: ast.FieldList{
+    	    {
+    	        Name: "author_id",
+    	        Type: &ast.Type{
+                    NamedType: "String_comparison_exp",
+    	        },
+    	    },
+            // フィールドがならぶ
+    	},
+    })
+}
+```
+
+こんな感じで生成できるようになるはず
